@@ -1,5 +1,185 @@
 # Orders-of-the-company
 Performance of the company based on orders 
+Downloaded the kaggle dataset
+
+
+
+
+python code using pandas libaray
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[2]:
+
+
+import kaggle
+
+
+# In[3]:
+
+
+get_ipython().system('kaggle datasets download ankitbansal06/retail-orders -f orders.csv')
+
+
+# In[4]:
+
+
+import zipfile
+zip_ref = zipfile.ZipFile("orders.csv.zip") 
+zip_ref.extractall() # extract file to dir
+zip_ref.close() # close file
+
+
+# In[5]:
+
+
+import pandas as pd
+import pandas.io
+from pandas.io import sql
+import pymysql
+
+
+# In[6]:
+
+
+df=pd.read_csv("orders.csv",na_values=["Not Available","unknown"])
+
+
+# In[7]:
+
+
+df.head()
+
+
+# In[8]:
+
+
+df.head(20)
+
+
+# In[9]:
+
+
+df["Ship Mode"].unique()
+
+
+# In[10]:
+
+
+df.columns=df.columns.str.lower()
+
+
+# In[11]:
+
+
+df.head()
+
+
+# In[12]:
+
+
+df.columns=df.columns.str.replace(" ","_")
+
+
+# In[13]:
+
+
+df.head()
+
+
+# In[14]:
+
+
+df["discount"]=df["list_price"]*df["discount_percent"]/100
+
+
+# In[15]:
+
+
+df.head()
+
+
+# In[16]:
+
+
+df
+
+
+# In[17]:
+
+
+df["sale_price"]=df["list_price"]-df["discount"]
+
+
+# In[18]:
+
+
+df
+
+
+# In[19]:
+
+
+df["profit"]=df["sale_price"]-df["cost_price"]
+
+
+# In[20]:
+
+
+df
+
+
+# In[21]:
+
+
+df.dtypes
+
+
+# In[22]:
+
+
+df["order_date"]=pd.to_datetime(df["order_date"],format="%Y-%m-%d")
+
+
+# In[23]:
+
+
+df.dtypes
+
+
+# In[24]:
+
+
+df=df.drop(columns=["cost_price"])
+
+
+# In[25]:
+
+
+df
+
+
+# In[26]:
+
+
+from sqlalchemy import create_engine
+engine=create_engine("mysql+pymysql://root:123@127.0.0.1:3306/db")
+conn=engine.connect()
+
+
+# In[27]:
+
+
+df.to_sql("orders",engine,index=False,if_exists="replace")
+conn.close()
+
+
+
+
+
+
+
+
 
 sql code 
 #TOP 10 selling products
